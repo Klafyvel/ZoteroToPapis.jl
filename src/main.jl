@@ -11,22 +11,22 @@ function parse_arguments(args)
         "--zotero-db", Dict(
             :help => "Path of the Zotero database.",
             :action => :store_arg,
-            :default => default_zotero_db(),
+            :default => "~/Zotero/zotero.sqlite",
         ),
         "--better-bibtex-db", Dict(
             :help => "Path of the Better Bibtex database.",
             :action => :store_arg,
-            :default => default_better_bibtex_db(),
+            :default => "~/Zotero/better-bibtex.sqlite",
         ),
         "--zotero-storage", Dict(
             :help => "Path of the Zotero storage.",
             :action => :store_arg,
-            :default => default_zotero_storage(),
+            :default => "~/Zotero/storage",
         ),
         "--papis-root", Dict(
             :help => "Path of the Papis root.",
             :action => :store_arg,
-            :default => BaseDirs.User.documents("papers"),
+            :default => "\$XDG_DOCUMENTS_DIR/papers",
         ),
         "--keep-external", Dict(
             :help => "If enabled, keep files not in Zotero storage where they are.",
