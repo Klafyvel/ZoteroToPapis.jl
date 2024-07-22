@@ -1,3 +1,9 @@
+  @static if VERSION >= v"1.8"
+    errno::Cint = 0
+else
+    errno = 0
+end
+
 function parse_arguments(args)
     settings = ArgParseSettings(
         prog = "ZoteroToPapis",
@@ -66,11 +72,12 @@ function main(args)
     append_zotero_id_on_duplicate = !parsed_arguments["no-duplication-mitigation"]
     zotero_db = SQLite.DB(zoterodb_path)
     betterbibtex_db = SQLite.DB(betterbibtexdb_path)
-    bibinternals = create_bibinternals(; zotero_db, betterbibtex_db, papis_root, zotero_storage, showprogress)
-    export_bibinternals(bibinternals; papis_root, showprogress, move_external, append_zotero_id_on_duplicate)
+    entries = create_zotero_entries(; zotero_db, betterbibtex_db, papis_root, zotero_storage, showprogress)
+    export_zotero_entries(entries; papis_root, showprogress, move_external, append_zotero_id_on_duplicate)
     if papisupdate
         papis_update(default_papis(), papisdoctor)
     end
+    errno
 end
 
 # Only works for Julia 1.12

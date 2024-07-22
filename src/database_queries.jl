@@ -1,8 +1,8 @@
 """
 $(SIGNATURES)
 
-Get the list of items in the Zotero database, excluding attachments. The returned
-`DataFrame` has the following columns: 
+Get the list of items in the Zotero database, excluding attachments, notes and 
+annotations. The returned `DataFrame` has the following columns: 
 - `itemID`
 - `typeName`
 - `key`
@@ -21,6 +21,8 @@ function get_zotero_items(db)
   WHERE
     itemTypes.itemTypeID = items.itemTypeID
     AND itemTypes.typeName != "attachment"
+    AND itemTypes.typeName != "annotation"
+    AND itemTypes.typeName != "note"
     AND deletedItems.itemID IS NULL
   ORDER BY
     items.itemID
