@@ -1,7 +1,6 @@
 module ZoteroToPapis
 
 using YAML
-using JSON3
 using SQLite
 using ProgressMeter
 using DataFrames
@@ -19,35 +18,6 @@ include("types.jl")
 include("zotero_importer.jl")
 include("biblatex_doctor.jl")
 include("papis_exporter.jl")
-
-"""
-$(SIGNATURES)
-
-Run `papis cache clear` and optionally `papis doctor --all-checks --all --fix`
-to fix all the mistakes that we've made. ;)
-"""
-function papis_update(papis, doctor)
-    if doctor
-        @info "Running $papis doctor --all-checks --all --json"
-        papis_diagnostics = open(`$papis doctor --all-checks --all --json`, "r", stdin) do io
-            read(io, String)
-        end |> JSON3.read
-        if !isempty(papis_diagnostics)
-            io = IOBuffer()
-            write(io, "Papis found the following errors in the database:")
-            format_structured_list(
-                io,
-                [
-                    "$(diagnostic["name"]): $(diagnostic["msg"])\n$(diagnostic["path"])"
-                    for diagnostic in papis_diagnostics
-                ],
-            )
-            @warn String(take!(io))
-        end
-    end
-    @info "Running $papis cache reset"
-    run(`$papis cache reset`)
-end
 
 include("main.jl")
 
