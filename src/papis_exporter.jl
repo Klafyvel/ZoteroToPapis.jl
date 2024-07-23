@@ -14,6 +14,7 @@ function export_zotero_entry(entry; papis_root, move_external, append_zotero_id_
     end
     mkpath(filepath)
     biblatex_entry = BibLaTeXEntry(entry)
+    substitute_missing_required!(biblatex_entry)
     dict = to_dict(biblatex_entry)
     for (i, file) in enumerate(biblatex_entry.files)
         old_file = joinpath(file.filepath, file.filename)
@@ -54,7 +55,7 @@ function export_zotero_entry(entry; papis_root, move_external, append_zotero_id_
         push!(problematic_path, (info_file, "Info file already exist: possible duplicate. Overwriting."))
     end
     YAML.write_file(info_file, dict)
-    problematic_path
+    problematic_path, missing_required(biblatex_entry)
 end
 
 """
@@ -66,29 +67,44 @@ function export_zotero_entries(entries; papis_root, showprogress, move_external,
     p = Progress(length(entries); enabled = showprogress, desc = "Exporting $(length(entries)) item(s)...")
     files_created = []
     problematic_paths = Channel(length(entries))
+    missing_entries = Channel(length(entries))
     # This time we can do it concurrently!
     Threads.@threads for entry in entries
-        problematic_path = export_zotero_entry(entry; papis_root, move_external, append_zotero_id_on_duplicate)
+        problematic_path, missing_fields = export_zotero_entry(entry; papis_root, move_external, append_zotero_id_on_duplicate)
         if !isempty(problematic_path)
             put!(problematic_paths, (entry.citationkey, problematic_path))
+        end
+        if !isempty(missing_fields)
+            put!(missing_entries, (entry.citationkey, missing_fields))
         end
         next!(p, showvalues = [(:Key, entry.citationkey)])
     end
     if !isempty(problematic_paths)
-        printstyled(stderr, "Warning:", bold = true, color = :yellow)
-        println(stderr, " encountered $(length(problematic_paths.data)) errors while exporting database.")
-    end
-    while !isempty(problematic_paths)
-        key, paths = take!(problematic_paths)
-        printstyled(stderr, "  ⋅ Key ")
-        printstyled(stderr, "$key", italic = true)
-        print(stderr, ":\n")
-        for (path, msg) in paths
-            print(stderr, "    - ")
-            printstyled(stderr, msg, color = :red)
-            print(stderr, "\n      ")
-            printstyled(stderr, path, color = :yellow)
-            print(stderr, "\n")
+        io = IOBuffer()
+        write(io, "Encountered $(length(problematic_paths.data)) errors while exporting database.\n")
+        while !isempty(problematic_paths)
+            key, paths = take!(problematic_paths)
+            format_structured_list(
+                io, [
+                    "Key $key:",
+                    ["$msg\n$path" for (path, msg) in paths],
+                ],
+            )
         end
+        @warn String(take!(io))
+    end
+    if !isempty(missing_entries)
+        io = IOBuffer()
+        write(io, "The following items are missing required fields:\n")
+        while !isempty(missing_entries)
+            key, fields = take!(missing_entries)
+            joined_fields = join(fields, ",", " and ")
+            format_structured_list(
+                io, [
+                    "Key $key: $(joined_fields)",
+                ],
+            )
+        end
+        @warn String(take!(io))
     end
 end

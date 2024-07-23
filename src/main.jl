@@ -1,4 +1,4 @@
-  @static if VERSION >= v"1.8"
+@static if VERSION >= v"1.8"
     errno::Cint = 0
 else
     errno = 0

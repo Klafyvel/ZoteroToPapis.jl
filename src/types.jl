@@ -100,7 +100,7 @@ const ZOTERO_TO_BIBLATEX_FIELDS = Dict(
     "number" => "number",
     "code" => nothing,
     "codeVolume" => "part",
-    "section" => "chapter",
+    "chapter" => "section",
     "codePages" => nothing,
     "pages" => "pages",
     "legislativeBody" => nothing,
@@ -279,13 +279,11 @@ BibLaTeXEntry(z::ZoteroEntry) = BibLaTeXEntry(
     z.tags,
     Dates.now(),
 )
-format_author_list(authors) = join(authors, " and ")
 to_dict(b::BibLaTeXEntry) = OrderedDict(
     [
         "type" => b.type,
         "ref" => b.ref,
         "author_list" => b.authors,
-        "author" => format_author_list(b.authors),
         [k => escape_string(v) for (k, v) in b.fields]...,
         "zotero_extra_fields" => b.zotero_extra_fields,
         "files" => [file.filename for file in b.files],
