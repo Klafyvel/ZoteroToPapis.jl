@@ -37,3 +37,9 @@ $(SIGNATURES)
 Generate a citation key for those who do not have one.
 """
 generate_citationkey(lastname, year) = camelCase(lastname) * year
+"""
+$(SIGNATURES)
+
+Format a list of names.
+"""
+format_name_list(authors) = join(authors, " and ")

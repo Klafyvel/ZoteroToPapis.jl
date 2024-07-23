@@ -110,8 +110,6 @@ struct DynamicSubstituter <: AbstractSubstituter
 end
 replace_missing_field(s::DynamicSubstituter, fieldname, entry) = s.fun(fieldname, entry)
 
-format_author_list(authors) = join(authors, " and ")
-
 const BIBLATEX_DYNAMIC_SUBSTITUTERS = Dict(
     "url" => DynamicSubstituter(
         (fieldname, entry) -> if haskey(entry.fields, "doi")
@@ -122,7 +120,7 @@ const BIBLATEX_DYNAMIC_SUBSTITUTERS = Dict(
     ),
     "author" => DynamicSubstituter(
         (fieldname, entry) -> if !isempty(entry.authors)
-            format_author_list(entry.authors)
+            format_name_list(entry.authors)
         else
             nothing
         end,

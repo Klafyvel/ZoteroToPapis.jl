@@ -72,6 +72,7 @@ associated to `nothing` are reported in a specific `zotero-field` section.
 """
 const ZOTERO_TO_BIBLATEX_FIELDS = Dict(
     "title" => "title",
+    "editor" => "editor",
     "abstractNote" => "abstract",
     "artworkMedium" => nothing,
     "medium" => nothing,

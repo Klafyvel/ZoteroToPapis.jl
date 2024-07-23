@@ -44,7 +44,11 @@ function prepare_item(itemid, key, typeName; zotero_storage, db, dbbb, papis_roo
     end
     fields["database_id"] = string(itemid)
     fields["database_key"] = string(key)
-    authors = [dr.firstName * " " * dr.lastName for dr in eachrow(df_creators)]
+    authors = [dr.firstName * " " * dr.lastName for dr in eachrow(subset(df_creators, :creatorType => ByRow(≠("editor"))))]
+    editor_list = [dr.firstName * " " * dr.lastName for dr in eachrow(subset(df_creators, :creatorType => ByRow(==("editor"))))]
+    if !isempty(editor_list)
+        fields["editor"] = format_name_list(editor_list)
+    end
     citationkey = nrow(df_citationkeys) > 0 ? first(df_citationkeys.citationKey) : nothing
 
     ## Creating attachments
