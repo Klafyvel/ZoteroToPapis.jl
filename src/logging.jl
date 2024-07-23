@@ -1,6 +1,6 @@
-LIST_MARKERS = ["-", "⋅", "∘"]
+LIST_MARKERS = ["⋅", "∘", "-"]
 function format_list_item(io, item, indent = 0)
-    sp = "  "^indent
+    sp = " " * "  "^indent
     marker = LIST_MARKERS[indent + 1]
     write(io, sp)
     write(io, marker)
@@ -23,4 +23,10 @@ function format_structured_list(io, list, indent = 0)
             format_list_item(io, item, indent)
         end
     end
+end
+
+function format_structured_list(list)
+    io = IOBuffer()
+    format_structured_list(io, list)
+    String(take!(io))
 end

@@ -65,8 +65,14 @@ function main(args)
     entries = create_zotero_entries(; zotero_db, betterbibtex_db, papis_root, zotero_storage, showprogress)
     export_zotero_entries(entries; papis_root, showprogress, move_external, append_zotero_id_on_duplicate)
     @info """Export done. You should now run 
-     ⋅ `papis cache reset` to synchronize the database,
-     ⋅ `papis doctor --check-all --all --suggest --explain` to find potential issues.
+    $(
+        format_structured_list(
+            [
+                "`papis cache reset` to synchronize the database,",
+                "`papis doctor --check-all --all --suggest --explain` to find potential issues.",
+            ],
+        )
+    )
     """
     errno
 end
