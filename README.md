@@ -12,7 +12,7 @@ Migrate Zotero+BetterBibtex database to Papis.
 You need a working Julia installation. I recommend having a dedicated environment that you can throw when you are done.
 
 ```bash
-julia --project=@ZoteroToPapis -e 'import Pkg; Pkg.add("https://github.com/Klafyvel/ZoteroToPapis.jl")'
+julia --project=@ZoteroToPapis -e 'import Pkg; Pkg.add(url="https://github.com/Klafyvel/ZoteroToPapis.jl")'
 ```
 
 If you're gonna use the script often, you may add an alias:
